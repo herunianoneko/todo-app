@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- スマホで見やすく表示するための重要なおまじない -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スマホTODOアプリ</title>
+  </head>
+  <body>
+    <h1>📱 マイTODOリスト</h1>
+    
+    <!-- 入力エリア -->
+    <input type="text" id="taskInput" placeholder="やることを入力...">
+    <button onclick="addTask()">追加</button>
+
+    <!-- タスク一覧 -->
+    <ul id="taskList"></ul>
+
+    <script>
+      // ページが開いたときに、保存されているタスクを自動で読み込む
+      window.onload = function() {
+        loadTasks();
+      };
+
+      // タスクを追加する関数
+      function addTask() {
+        const input = document.getElementById("taskInput");
+        const text = input.value.trim();
+        if (text === "") return;
+
+        createTaskElement(text);
+        saveTasks();
+        input.value = "";
+      }
+
+      // 画面にタスク（文字＋削除ボタン）を表示する関数
+      function createTaskElement(text) {
+        const li = document.createElement("li");
+        li.innerText = text + " ";
+
+        // 削除ボタンを作る
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "削除";
+        deleteBtn.onclick = function() {
+          li.remove(); // 画面から消す
+          saveTasks(); // 最新状態を保存する
+        };
+
+        li.appendChild(deleteBtn);
+        document.getElementById("taskList").appendChild(li);
+      }
+
+      // スマホ（ブラウザ）の中にタスクを保存する機能
+      function saveTasks() {
+        const tasks = [];
+        const items = document.querySelectorAll("#taskList li");
+        items.forEach(item => {
+          // 「削除」ボタンの文字を除いた純粋なタスクテキストを取得
+          const text = item.firstChild.textContent.trim();
+          tasks.push(text);
+        });
+        // ブラウザの保存領域（LocalStorage）に保存
+        localStorage.setItem("myTodoList", JSON.stringify(tasks));
+      }
+
+      // スマホ（ブラウザ）から保存されたタスクを読み込む機能
+      function loadTasks() {
+        const saved = localStorage.getItem("myTodoList");
+        if (saved) {
+          const tasks = JSON.parse(saved);
+          tasks.forEach(text => createTaskElement(text));
+        }
+      }
+    </script>
+  </body>
+</html>
